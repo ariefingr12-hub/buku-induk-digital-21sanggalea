@@ -3,156 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal SANG21</title>
+  <title>Portal Buku Induk SANG21</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* DESAIN TAMPILAN */
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    /* DESAIN DASAR */
+    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #e2e8f0; }
     .hidden { display: none !important; }
     
-    /* Desain Kotak Login */
-    .login-container { background-color: #1e293b; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid #334155; }
-    .logo-icon { font-size: 45px; color: #3b82f6; margin-bottom: 15px; }
-    .title { font-size: 26px; font-weight: bold; margin: 0 0 5px 0; }
-    .subtitle { font-size: 14px; color: #94a3b8; margin-bottom: 30px; }
-    .input-group { margin-bottom: 20px; text-align: left; }
-    .input-group input { width: 100%; padding: 15px; border-radius: 10px; background-color: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; font-size: 15px; }
-    .input-group input:focus { border-color: #3b82f6; outline: none; }
-    .btn-login { width: 100%; padding: 15px; border-radius: 10px; background-color: #2563eb; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    .btn-login:hover { background-color: #1d4ed8; }
-    .error-msg { color: #ef4444; font-size: 14px; margin-top: 15px; display: none; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; }
+    /* LOGIN */
+    .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .login-container { background-color: #1e293b; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid #334155; }
+    .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
+    .btn-login { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .error-msg { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
 
-    /* Desain Dashboard (Setelah Login) */
-    .app-container { width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
-    .navbar { background-color: #1e293b; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
-    .btn-logout { background-color: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-    .form-container { background-color: #1e293b; padding: 30px; border-radius: 15px; border: 1px solid #334155; }
+    /* LAYOUT DASHBOARD */
+    .app-container { display: flex; min-height: 100vh; }
+    
+    /* SIDEBAR (FITUR APLIKASI) */
+    .sidebar { width: 250px; background-color: #1e293b; padding: 20px 0; border-right: 1px solid #334155; }
+    .sidebar-header { padding: 0 20px 20px 20px; border-bottom: 1px solid #334155; margin-bottom: 20px; text-align: center; }
+    .menu-item { padding: 12px 20px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+    .menu-item:hover, .menu-item.active { background-color: #3b82f6; color: white; border-left: 4px solid white; }
+
+    /* KONTEN UTAMA */
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+    .header-bar { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: center; }
+    
+    /* FORM BUKU INDUK (7 BAGIAN) */
+    .form-section { background-color: #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #334155; }
+    .form-section h3 { margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; color: #3b82f6; }
+    
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 14px; }
-    .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 8px; background-color: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
-    .btn-submit { background-color: #10b981; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #cbd5e1; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; background-color: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
+    
+    .btn-submit { background-color: #10b981; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
   </style>
 </head>
 <body>
 
-  <!-- ================= LAYAR LOGIN ================= -->
-  <div id="login-view" class="login-container">
-    <i class="fas fa-fingerprint logo-icon"></i>
-    <h1 class="title">PORTAL SANG21</h1>
-    <p class="subtitle">Sistem Pendataan SDN 21 Sanggalea</p>
-    
-    <form onsubmit="masukAplikasi(event)">
-      <div class="input-group">
+  <!-- ================= VIEW LOGIN ================= -->
+  <div id="login-view" class="login-wrapper">
+    <div class="login-container">
+      <h2 style="margin-top:0;"><i class="fas fa-book" style="color:#3b82f6;"></i> BUKU INDUK</h2>
+      <p style="color:#94a3b8; font-size:14px;">SDN 21 Sanggalea</p>
+      <form onsubmit="masukAplikasi(event)">
         <input type="text" id="username" placeholder="Username" required>
-      </div>
-      <div class="input-group">
         <input type="password" id="password" placeholder="Password" required>
-      </div>
-      <button type="submit" id="btn-login" class="btn-login">
-        <i class="fas fa-sign-in-alt"></i> Masuk Sistem
-      </button>
-      <div id="error-msg" class="error-msg">Username atau Password salah!</div>
-    </form>
+        <button type="submit" id="btn-login" class="btn-login">Masuk Aplikasi</button>
+        <div id="error-msg" class="error-msg">Akses Ditolak!</div>
+      </form>
+    </div>
   </div>
 
-  <!-- ================= LAYAR DASHBOARD ================= -->
+  <!-- ================= VIEW DASHBOARD (FULL APP) ================= -->
   <div id="app-layout" class="app-container hidden">
     
-    <div class="navbar">
-      <div>
-        <h2 style="margin:0; font-size: 20px;">PORTAL SANG21</h2>
-        <span id="user-role" style="color: #3b82f6; font-size: 14px;"></span>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3 style="margin:0; color:#3b82f6;">SANG21</h3>
+        <span id="user-role" style="font-size: 12px; color:#10b981;"></span>
       </div>
-      <button class="btn-logout" onclick="keluarAplikasi()">
-        <i class="fas fa-power-off"></i> Keluar
-      </button>
+      <!-- List Fitur -->
+      <div class="menu-item active"><i class="fas fa-user-plus"></i> Tambah Siswa</div>
+      <div class="menu-item"><i class="fas fa-users"></i> Daftar Siswa</div>
+      <div class="menu-item"><i class="fas fa-search"></i> Pencarian</div>
+      <div class="menu-item"><i class="fas fa-print"></i> Cetak Buku Induk</div>
+      <div class="menu-item"><i class="fas fa-file-export"></i> Export Data</div>
+      <div class="menu-item"><i class="fas fa-cogs"></i> Pengaturan</div>
+      <div class="menu-item" style="color:#ef4444;" onclick="keluarAplikasi()"><i class="fas fa-power-off"></i> Keluar</div>
     </div>
 
-    <div class="form-container">
-      <h3 style="margin-top:0; border-bottom: 1px solid #334155; padding-bottom: 15px;">Form Input Data Siswa</h3>
-      <form id="formSiswa" onsubmit="kirimData(event)">
+    <!-- KONTEN -->
+    <div class="main-content">
+      <div class="header-bar">
+        <h2>Input Buku Induk Siswa</h2>
+      </div>
+
+      <form id="formBukuInduk" onsubmit="kirimData(event)">
         
-        <div class="form-group">
-          <label>Pilih Kelas</label>
-          <select id="in_kelas" required>
-            <option value="">-- Pilih Kelas --</option>
-            <option value="1A">Kelas 1A</option>
-            <option value="1B">Kelas 1B</option>
-            <option value="2A">Kelas 2A</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Nama Lengkap Siswa</label>
-          <input type="text" id="in_nama" required>
-        </div>
-
-        <div class="form-group">
-          <label>NISN</label>
-          <input type="number" id="in_nisn" required>
-        </div>
-
-        <div class="form-group" style="display: flex; gap: 10px;">
-          <div style="flex: 1;">
-            <label>Tempat Lahir</label>
-            <input type="text" id="in_tempatLahir">
+        <!-- BAGIAN 1: DATA KELAS -->
+        <div class="form-section">
+          <h3>1. Data Kelas & Penerimaan</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Pilih Kelas (17 Rombel)</label>
+              <select id="in_kelas" required>
+                <option value="">-- Pilih Kelas --</option>
+                <option value="1A">Kelas 1A</option><option value="1B">Kelas 1B</option><option value="1C">Kelas 1C</option>
+                <option value="2A">Kelas 2A</option><option value="2B">Kelas 2B</option><option value="2C">Kelas 2C</option>
+                <option value="3A">Kelas 3A</option><option value="3B">Kelas 3B</option><option value="3C">Kelas 3C</option>
+                <option value="4A">Kelas 4A</option><option value="4B">Kelas 4B</option><option value="4C">Kelas 4C</option>
+                <option value="5A">Kelas 5A</option><option value="5B">Kelas 5B</option><option value="5C">Kelas 5C</option>
+                <option value="6A">Kelas 6A</option><option value="6B">Kelas 6B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tanggal Diterima</label>
+              <input type="date" id="in_tglDiterima">
+            </div>
           </div>
-          <div style="flex: 1;">
-            <label>Tanggal Lahir</label>
-            <input type="date" id="in_tglLahir">
+        </div>
+
+        <!-- BAGIAN 2: DATA SISWA -->
+        <div class="form-section">
+          <h3>2. Data Utama Siswa</h3>
+          <div class="form-group">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="in_nama" required>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>NISN</label>
+              <input type="number" id="in_nisn" required>
+            </div>
+            <div class="form-group">
+              <label>NIK (Nomor Induk Kependudukan)</label>
+              <input type="number" id="in_nik">
+            </div>
+            <div class="form-group">
+              <label>Tempat Lahir</label>
+              <input type="text" id="in_tempatLahir">
+            </div>
+            <div class="form-group">
+              <label>Tanggal Lahir</label>
+              <input type="date" id="in_tglLahir">
+            </div>
+          </div>
+        </div>
+
+        <!-- BAGIAN 3: DATA ORTU -->
+        <div class="form-section">
+          <h3>3. Data Orang Tua / Wali</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Nama Ayah</label>
+              <input type="text" id="in_ayah">
+            </div>
+            <div class="form-group">
+              <label>Pekerjaan Ayah</label>
+              <input type="text" id="in_kerjaAyah">
+            </div>
+            <div class="form-group">
+              <label>Nama Ibu</label>
+              <input type="text" id="in_ibu">
+            </div>
+            <div class="form-group">
+              <label>No HP / WA Aktif</label>
+              <input type="number" id="in_nohp">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bagian 4-7 digabung agar tidak terlalu kepanjangan di HTML ini, tapi field esensialnya ada -->
+        <div class="form-section">
+          <h3>4-7. Pendidikan, Kesehatan, Prestasi & Mutasi</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Asal TK / Sekolah Sebelumnya</label>
+              <input type="text" id="in_asaltk">
+            </div>
+            <div class="form-group">
+              <label>Golongan Darah</label>
+              <select id="in_goldar">
+                <option value="-">-- Pilih --</option>
+                <option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Prestasi Menonjol</label>
+              <input type="text" id="in_prestasi" placeholder="Misal: Juara 1 Lomba Puisi">
+            </div>
+            <div class="form-group">
+              <label>Status Siswa</label>
+              <select id="in_status">
+                <option value="Aktif">Aktif</option>
+                <option value="Pindah/Mutasi">Pindah / Mutasi</option>
+                <option value="Lulus">Lulus</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <button type="submit" id="btn-submit" class="btn-submit">
-          <i class="fas fa-paper-plane"></i> Simpan Data Siswa
+          <i class="fas fa-save"></i> SIMPAN BUKU INDUK
         </button>
+
       </form>
     </div>
-
   </div>
 
-  <!-- ================= KODE LOGIKANYA ================= -->
   <script>
-    // URL Database Google Script Anda
+    // URL Web App GAS Anda (Pastikan update jika deploy versi baru)
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwoMJzIIjcLTaVtX-Eslnf3__HKp2IbXSqjiiqlhm89lGsLb55PbE0_odCMRcigBSOo/exec";
 
-    // Fungsi Login Paling Aman
     function masukAplikasi(event) {
-      event.preventDefault(); // Mencegah loading layar
-      
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      const btn = document.getElementById('btn-login');
+      event.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
       const err = document.getElementById('error-msg');
       
-      // Ubah tampilan tombol
-      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Authenticating...";
-      btn.disabled = true;
-      err.style.display = 'none';
-
-      // Cek akun secara langsung (jauh lebih cepat dan anti-error)
-      setTimeout(() => {
-        if (user === "admin" && pass === "admin123") {
-          bukaDashboard("Guru / Admin");
-        } else if (user === "ortu" && pass === "ortu123") {
-          bukaDashboard("Orang Tua Wali");
-        } else {
-          // Jika salah password
-          err.style.display = 'block';
-          btn.innerHTML = "<i class='fas fa-sign-in-alt'></i> Masuk Sistem";
-          btn.disabled = false;
-        }
-      }, 800); 
-    }
-
-    function bukaDashboard(namaAkses) {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('app-layout').classList.remove('hidden');
-      document.getElementById('user-role').innerHTML = `<i class="fas fa-check-circle"></i> Login sebagai: ${namaAkses}`;
-      
-      // Kembalikan tombol login seperti semula untuk nanti
-      document.getElementById('btn-login').innerHTML = "<i class='fas fa-sign-in-alt'></i> Masuk Sistem";
-      document.getElementById('btn-login').disabled = false;
+      if(u === "admin" && p === "admin123") {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('user-role').innerText = "Akses: Administrator";
+      } else {
+        err.style.display = 'block';
+      }
     }
 
     function keluarAplikasi() {
@@ -162,47 +222,46 @@
       document.getElementById('password').value = '';
     }
 
-    // Fungsi Kirim Data ke Google Sheets (Anti-CORS Blokir)
     async function kirimData(event) {
       event.preventDefault();
-      
-      const btnSubmit = document.getElementById('btn-submit');
-      btnSubmit.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Menyimpan ke Database...";
-      btnSubmit.disabled = true;
+      const btn = document.getElementById('btn-submit');
+      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> MENYIMPAN DATA...";
+      btn.disabled = true;
 
-      // Ambil data dari kotak isian
-      const dataDikirim = {
+      const dataSiswa = {
         action: 'simpan',
         kelas: document.getElementById('in_kelas').value,
         nama: document.getElementById('in_nama').value,
         nisn: document.getElementById('in_nisn').value,
+        nik: document.getElementById('in_nik').value,
         tempatLahir: document.getElementById('in_tempatLahir').value,
         tglLahir: document.getElementById('in_tglLahir').value,
-        // Kolom yang dikosongkan sementara bisa ditambahkan sendiri formnya
-        jk: "-", agama: "-", alamat: "-", namaAyah: "-", namaIbu: "-", pekerjaan: "-", noHp: "-"
+        ayah: document.getElementById('in_ayah').value,
+        kerjaAyah: document.getElementById('in_kerjaAyah').value,
+        ibu: document.getElementById('in_ibu').value,
+        nohp: document.getElementById('in_nohp').value,
+        asaltk: document.getElementById('in_asaltk').value,
+        goldar: document.getElementById('in_goldar').value,
+        prestasi: document.getElementById('in_prestasi').value,
+        status: document.getElementById('in_status').value
       };
 
       try {
-        // Tembak data ke Google Script
         await fetch(GAS_URL, {
           method: 'POST',
-          mode: 'no-cors', // Ini rahasianya agar tidak diblokir Vercel
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataDikirim)
+          body: JSON.stringify(dataSiswa)
         });
-
-        alert("SUKSES! Data siswa berhasil dikirim ke Google Sheets.");
-        document.getElementById('formSiswa').reset(); // Bersihkan form
-        
+        alert("BERHASIL! Data Buku Induk tersimpan.");
+        document.getElementById('formBukuInduk').reset();
       } catch (error) {
-        alert("Gagal mengirim data. Pastikan ada koneksi internet.");
+        alert("Gagal. Cek koneksi internet Anda.");
       }
-
-      // Kembalikan tombol seperti semula
-      btnSubmit.innerHTML = "<i class='fas fa-paper-plane'></i> Simpan Data Siswa";
-      btnSubmit.disabled = false;
+      
+      btn.innerHTML = "<i class='fas fa-save'></i> SIMPAN BUKU INDUK";
+      btn.disabled = false;
     }
   </script>
-
 </body>
 </html>
