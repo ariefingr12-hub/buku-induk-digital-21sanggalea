@@ -206,11 +206,18 @@
       const p = document.getElementById('password').value;
       const err = document.getElementById('error-msg');
       
-      if(u === "admin" && p === "admin123") {
+      if (u === "admin" && p === "admin123") {
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
-        document.getElementById('user-role').innerText = "Akses: Administrator";
-      } else {
+        document.getElementById('user-role').innerText = "Akses: Administrator / Guru";
+      } 
+      // Nah, ini dia baris yang hilang kemarin bro!
+      else if (u === "ortu" && p === "ortu123") {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('user-role').innerText = "Akses: Orang Tua / Wali";
+      } 
+      else {
         err.style.display = 'block';
       }
     }
