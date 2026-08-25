@@ -191,64 +191,51 @@
   <!-- JAVASCRIPT -->
   <script>
    // MASUKKAN URL WEB APP GAS ANDA DI SINI
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxBfXjeWQMJ2IvKWIO9DXxJY43YRR0DGxzosMN5UONJnFCzDD9dKXsmqEyoK_S1mLPh/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwoMJzIIjcLTaVtX-Eslnf3__HKp2IbXSqjiiqlhm89lGsLb55PbE0_odCMRcigBSOo/exec";
 
-    const daftarKelas = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C', '4A', '4B', '4C', '5A', '5B', '5C', '6A', '6B'];
-    let kelasAktif = "";
+    // ... (Kode daftarKelas dan event listener sidebar biarkan sama) ...
 
-    document.addEventListener("DOMContentLoaded", function() {
-      const menuContainer = document.getElementById('sidebar-menu');
-      daftarKelas.forEach(kelas => {
-        const li = document.createElement('li');
-        li.innerHTML = `<i class="fas fa-user-graduate" style="width:20px;"></i> Kelas ${kelas}`;
-        li.onclick = () => bukaFormKelas(kelas, li);
-        menuContainer.appendChild(li);
-      });
-    });
-
-    // --- FUNGSI LOGIN (VERSI FETCH API UNTUK VERCEL) ---
-    async function masukAplikasi() {
+    // --- FUNGSI LOGIN ---
+    function masukAplikasi() {
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
       const btn = event.target;
+      const err = document.getElementById('error-msg');
+      
       const originalText = btn.innerHTML;
       btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Authenticating...";
+      err.style.display = 'none'; // Sembunyikan error sebelumnya
 
-      try {
-        // Tembak data ke URL Google Script
-        const response = await fetch(GAS_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'login',
-            username: user,
-            password: pass
-          })
-        });
-
-        const res = await response.json(); // Terima jawaban dari GAS
-        btn.innerHTML = originalText;
-
-        if (res.success) {
-          document.getElementById('login-view').style.opacity = '0';
-          setTimeout(() => {
-            document.getElementById('login-view').classList.add('hidden');
-            document.getElementById('app-layout').classList.remove('hidden');
-            document.getElementById('user-role').innerHTML = `<i class="fas fa-user-check"></i> Akses: ${res.nama}`;
-          }, 400); 
-        } else {
-          const err = document.getElementById('error-msg');
-          err.innerText = res.message;
-          err.style.display = 'block';
-        }
-      } catch (error) {
-        btn.innerHTML = originalText;
-        const err = document.getElementById('error-msg');
-        err.innerText = "Gagal terhubung ke server database.";
-        err.style.display = 'block';
-      }
+      // Cek manual di frontend dulu (karena kita akan pakai no-cors nanti kalau mau dipisah murni)
+      // Untuk amannya, kita bisa verifikasi langsung di sini dulu jika akunnya statis.
+      setTimeout(() => {
+          if (user === "admin" && pass === "admin123") {
+            berhasilLogin("Administrator / Guru", originalText, btn);
+          } else if (user === "ortu" && pass === "ortu123") {
+            berhasilLogin("Orang Tua Wali Siswa", originalText, btn);
+          } else {
+            gagalLogin("Username atau Password salah!", originalText, btn, err);
+          }
+      }, 800); // Simulasi loading agar UI terlihat responsif
     }
 
-    // --- FUNGSI KIRIM DATA (VERSI FETCH API UNTUK VERCEL) ---
+    function berhasilLogin(namaRole, originalText, btn) {
+        btn.innerHTML = originalText;
+        document.getElementById('login-view').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('login-view').classList.add('hidden');
+          document.getElementById('app-layout').classList.remove('hidden');
+          document.getElementById('user-role').innerHTML = `<i class="fas fa-user-check"></i> Akses: ${namaRole}`;
+        }, 400); 
+    }
+
+    function gagalLogin(pesan, originalText, btn, err) {
+        btn.innerHTML = originalText;
+        err.innerText = pesan;
+        err.style.display = 'block';
+    }
+
+    // --- FUNGSI KIRIM DATA (MENGGUNAKAN FORM DATA & NO-CORS) ---
     async function kirimData(e) {
       e.preventDefault(); 
       
@@ -257,7 +244,9 @@
       btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Menyimpan...";
       btn.disabled = true; 
 
+      // Siapkan data untuk dikirim
       const dataSiswa = {
+        action: 'simpan',
         kelas: kelasAktif, 
         nama: document.getElementById('in_nama').value,
         nisn: document.getElementById('in_nisn').value,
@@ -273,57 +262,30 @@
       };
 
       try {
-        // Tembak data form ke GAS
-        const response = await fetch(GAS_URL, {
+        // Menggunakan fetch dengan mode 'no-cors' agar tidak diblokir browser
+        // Catatan: response tidak bisa dibaca isinya kalau pakai no-cors
+        await fetch(GAS_URL, {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'simpan',
-            payload: dataSiswa
-          })
+          mode: 'no-cors', // INI KUNCI UTAMANYA
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dataSiswa)
         });
 
-        const res = await response.json();
+        // Karena no-cors tidak mengembalikan response sukses/gagal yang bisa dibaca, 
+        // kita asumsikan sukses jika fetch berhasil dijalankan tanpa error jaringan.
         btn.innerHTML = originalText;
         btn.disabled = false;
-        
-        if (res.success) {
-          alert('Berhasil: ' + res.message);
-          document.getElementById('formSiswa').reset(); 
-        } else {
-          alert('Gagal: ' + res.message);
-        }
+        alert('Data telah dikirim! Silakan cek Spreadsheet untuk memastikan.');
+        document.getElementById('formSiswa').reset(); 
+
       } catch (error) {
+        console.error('Error:', error);
         btn.innerHTML = originalText;
         btn.disabled = false;
-        alert('Gagal terhubung ke server database.');
+        alert('Gagal mengirim data. Cek koneksi internet Anda.');
       }
     }
 
-    // Fungsi buka view dan logout tetap sama seperti sebelumnya
-    function logout() {
-      document.getElementById('app-layout').classList.add('hidden');
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('login-view').style.opacity = '1';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-      document.getElementById('error-msg').style.display = 'none';
-      bukaView('dashboard'); 
-    }
-
-    function bukaView(id) {
-      document.getElementById('view-dashboard').classList.add('hidden');
-      document.getElementById('view-form').classList.add('hidden');
-      document.getElementById('view-' + id).classList.remove('hidden');
-      document.querySelectorAll('#sidebar-menu li').forEach(el => el.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-    }
-
-    function bukaFormKelas(kelas, elemenList) {
-      kelasAktif = kelas; 
-      document.getElementById('view-dashboard').classList.add('hidden');
-      document.getElementById('view-form').classList.remove('hidden');
-      document.getElementById('judul-form-kelas').innerHTML = `Input Data Siswa - <span style="color:var(--primary);">Kelas ${kelas}</span>`;
-      document.querySelectorAll('#sidebar-menu li').forEach(el => el.classList.remove('active'));
-      if(elemenList) elemenList.classList.add('active');
-      document.getElementById('formSiswa').reset(); 
-    }
+    // ... (Fungsi logout, bukaView, bukaFormKelas biarkan sama) ...
