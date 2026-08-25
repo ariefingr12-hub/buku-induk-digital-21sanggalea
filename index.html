@@ -1,167 +1,196 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Buku Induk SANG21</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; }
+    /* DESAIN DASAR */
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #e2e8f0; }
     .hidden { display: none !important; }
-    .main-content { padding: 30px; max-width: 800px; margin: auto; }
-    .form-section { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;}
-    input, select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box;}
-    button { background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;}
-    .btn-edit-mode { background: #f59e0b; margin-bottom: 20px; }
-    .btn-submit { background: #10b981; font-size: 16px;}
-    .photo-preview { width: 120px; height: 160px; border: 2px dashed #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0f172a; margin-top: 10px; }
+    .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .login-container { background: #1e293b; padding: 40px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #334155; }
+    .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
+    .btn-login { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .app-container { display: flex; min-height: 100vh; }
+    .sidebar { width: 250px; background-color: #1e293b; padding: 20px 0; border-right: 1px solid #334155; }
+    .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid #334155; margin-bottom: 20px; text-align: center; }
+    .menu-item { padding: 12px 20px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+    .menu-item:hover, .menu-item.active { background-color: #3b82f6; color: white; border-left: 4px solid white; }
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+    .form-section { background: #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #334155; }
+    .form-section h3 { margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; color: #3b82f6; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #cbd5e1; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
+    .btn-submit { background: #10b981; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    .photo-preview { width: 120px; height: 160px; border: 2px dashed #334155; display: flex; align-items: center; justify-content: center; margin-top: 10px; overflow: hidden; background: #0f172a; color: #64748b; font-size: 12px; text-align: center; }
     .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
 
-  <div class="main-content">
-    <h2 id="judul-form">Input Data Baru</h2>
-    
-    <!-- TOMBOL GANTI MODE -->
-    <button class="btn-edit-mode" onclick="toggleEditMode()" id="btn-toggle-mode">
-      <i class="fas fa-search"></i> Ganti ke Mode Edit Data
-    </button>
+  <!-- VIEW LOGIN -->
+  <div id="login-view" class="login-wrapper">
+    <div class="login-container">
+      <h2 style="margin-top:0;"><i class="fas fa-book" style="color:#3b82f6;"></i> BUKU INDUK</h2>
+      <p style="color:#94a3b8; font-size:14px;">SDN 21 Sanggalea</p>
+      <form onsubmit="masukAplikasi(event)">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit" class="btn-login">Masuk Aplikasi</button>
+      </form>
+    </div>
+  </div>
 
-    <!-- KOTAK PENCARIAN (HANYA MUNCUL SAAT EDIT) -->
-    <div id="box-pencarian" class="form-section hidden">
-      <h3>Cari Data Siswa</h3>
-      <label>Masukkan NIS Siswa yang ingin diedit:</label>
-      <input type="number" id="search_nis" placeholder="Ketik NIS...">
-      <button onclick="cariSiswa()" id="btn-cari"><i class="fas fa-search"></i> Cari Data</button>
+  <!-- VIEW DASHBOARD -->
+  <div id="app-layout" class="app-container hidden">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3 style="margin:0; color:#3b82f6;">SANG21</h3>
+        <span id="user-role" style="font-size: 12px; color:#10b981;"></span>
+      </div>
+      <div class="menu-item active"><i class="fas fa-user-plus"></i> Input / Tambah Data</div>
+      <div class="menu-item"><i class="fas fa-edit"></i> Edit Data Siswa</div> <!-- Menu Edit -->
+      <div class="menu-item"><i class="fas fa-users"></i> Daftar Siswa</div>
+      <div class="menu-item" style="color:#ef4444;" onclick="keluarAplikasi()"><i class="fas fa-power-off"></i> Keluar</div>
     </div>
 
-    <!-- FORM UTAMA -->
-    <form id="formBukuInduk" onsubmit="kirimData(event)">
-      <div class="form-section">
-        <label>Pas Foto Siswa (Maks 5MB)</label>
-        <input type="file" id="in_foto" accept="image/png, image/jpeg" onchange="previewFoto(event)">
-        <div id="foto-preview-box" class="photo-preview">Belum ada foto</div>
-        <input type="hidden" id="foto_base64">
+    <!-- KONTEN -->
+    <div class="main-content">
+      <h2>Input Buku Induk Siswa</h2>
+      <form id="formBukuInduk" onsubmit="kirimData(event)">
         
-        <label>Nama Lengkap</label>
-        <input type="text" id="in_nama" required>
-        
-        <label>NIS</label>
-        <input type="number" id="in_nis" required>
-        
-        <label>NISN</label>
-        <input type="number" id="in_nisn" required>
-        
-        <label>Kelas</label>
-        <select id="in_kelas" required>
-          <option value="">-- Pilih --</option>
-          <option value="1A">1A</option><option value="2A">2A</option>
-        </select>
-      </div>
-      
-      <button type="submit" id="btn-submit" class="btn-submit">
-        <i class="fas fa-save"></i> SIMPAN DATA BARU
-      </button>
-    </form>
+        <div class="form-section">
+          <h3>Data Utama & Foto Siswa</h3>
+          
+          <div class="form-group">
+            <label>Pas Foto Siswa (Maksimal 5MB, Format: JPG/PNG)</label>
+            <input type="file" id="in_foto" accept="image/png, image/jpeg" onchange="previewFoto(event)">
+            <div id="foto-preview-box" class="photo-preview">Belum ada foto</div>
+            <input type="hidden" id="foto_base64"> <!-- Tempat menyimpan foto sementara -->
+          </div>
+
+          <div class="form-group">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="in_nama" required>
+          </div>
+          
+          <div class="grid-2">
+            <!-- TAMBAHAN NIS -->
+            <div class="form-group">
+              <label>NIS (Nomor Induk Siswa)</label>
+              <input type="number" id="in_nis" required>
+            </div>
+            <div class="form-group">
+              <label>NISN (Nomor Induk Siswa Nasional)</label>
+              <input type="number" id="in_nisn" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Pilih Kelas</label>
+            <select id="in_kelas" required>
+              <option value="">-- Pilih Kelas --</option>
+              <option value="1A">Kelas 1A</option><option value="1B">Kelas 1B</option>
+              <option value="2A">Kelas 2A</option><option value="2B">Kelas 2B</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn-submit">
+          <i class="fas fa-save"></i> SIMPAN BUKU INDUK
+        </button>
+
+      </form>
+    </div>
   </div>
 
   <script>
-    var modeAplikasi = 'input'; // Default adalah input baru
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwoMJzIIjcLTaVtX-Eslnf3__HKp2IbXSqjiiqlhm89lGsLb55PbE0_odCMRcigBSOo/exec";
 
-    // FUNGSI GANTI MODE (INPUT / EDIT)
-    function toggleEditMode() {
-      const boxCari = document.getElementById('box-pencarian');
-      const btnToggle = document.getElementById('btn-toggle-mode');
-      const judul = document.getElementById('judul-form');
-      const btnSubmit = document.getElementById('btn-submit');
-      const inputNis = document.getElementById('in_nis');
-
-      if (modeAplikasi === 'input') {
-        modeAplikasi = 'edit';
-        boxCari.classList.remove('hidden');
-        btnToggle.innerHTML = "<i class='fas fa-plus'></i> Kembali ke Mode Input Baru";
-        btnToggle.style.background = "#3b82f6";
-        judul.innerText = "Edit Data Siswa";
-        btnSubmit.innerHTML = "<i class='fas fa-save'></i> UPDATE DATA SISWA";
-        btnSubmit.style.background = "#f59e0b";
-        inputNis.readOnly = true; // NIS tidak boleh diubah saat edit
+    function masukAplikasi(event) {
+      event.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      
+      if (u === "admin" && p === "admin123") {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('user-role').innerText = "Akses: Administrator";
+      } else if (u === "ortu" && p === "ortu123") {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('user-role').innerText = "Akses: Orang Tua";
       } else {
-        modeAplikasi = 'input';
-        boxCari.classList.add('hidden');
-        btnToggle.innerHTML = "<i class='fas fa-search'></i> Ganti ke Mode Edit Data";
-        btnToggle.style.background = "#f59e0b";
-        judul.innerText = "Input Data Baru";
-        btnSubmit.innerHTML = "<i class='fas fa-save'></i> SIMPAN DATA BARU";
-        btnSubmit.style.background = "#10b981";
-        inputNis.readOnly = false;
-        document.getElementById('formBukuInduk').reset();
-        document.getElementById('foto-preview-box').innerHTML = "Belum ada foto";
+        alert("Akses Ditolak!");
       }
     }
 
-    // FUNGSI CARI DATA (UNTUK EDIT)
-    function cariSiswa() {
-      const nisDicari = document.getElementById('search_nis').value;
-      if(!nisDicari) return alert("Masukkan NIS dulu!");
-      
-      const btnCari = document.getElementById('btn-cari');
-      btnCari.innerText = "Mencari...";
-      
-      // Memanggil fungsi cari di GAS (tanpa CORS!)
-      google.script.run.withSuccessHandler(function(hasil) {
-        btnCari.innerHTML = "<i class='fas fa-search'></i> Cari Data";
-        if (hasil.ketemu) {
-          document.getElementById('in_nama').value = hasil.nama;
-          document.getElementById('in_nis').value = hasil.nis;
-          document.getElementById('in_nisn').value = hasil.nisn;
-          document.getElementById('in_kelas').value = hasil.kelas;
-          alert("Data ditemukan! Silakan edit di bawah.");
-        } else {
-          alert("Data dengan NIS " + nisDicari + " tidak ditemukan!");
-        }
-      }).cariDataSiswa(nisDicari);
+    function keluarAplikasi() {
+      document.getElementById('app-layout').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
     }
 
-    // FUNGSI PREVIEW FOTO
+    // FUNGSI UPLOAD & CEK UKURAN FOTO (MAKS 5MB)
     function previewFoto(event) {
       const file = event.target.files[0];
+      const previewBox = document.getElementById('foto-preview-box');
+      const hiddenInput = document.getElementById('foto_base64');
+      
       if (file) {
-        if (file.size > 5242880) return alert("Maksimal 5MB!");
+        // Cek ukuran (5MB = 5 * 1024 * 1024 bytes)
+        if (file.size > 5242880) {
+          alert("Peringatan: Ukuran foto terlalu besar! Maksimal 5MB. Silakan kompres foto Anda terlebih dahulu.");
+          event.target.value = ""; // Kosongkan pilihan file
+          previewBox.innerHTML = "Belum ada foto";
+          hiddenInput.value = "";
+          return;
+        }
+
+        // Convert foto ke Base64 agar bisa dikirim ke Google Script
         const reader = new FileReader();
         reader.onload = function(e) {
-          document.getElementById('foto-preview-box').innerHTML = `<img src="${e.target.result}">`;
-          document.getElementById('foto_base64').value = e.target.result;
+          previewBox.innerHTML = `<img src="${e.target.result}">`;
+          hiddenInput.value = e.target.result; // Simpan teks panjang fotonya di sini
         }
         reader.readAsDataURL(file);
       }
     }
 
-    // FUNGSI KIRIM DATA (INPUT / UPDATE)
-    function kirimData(event) {
+    async function kirimData(event) {
       event.preventDefault();
       const btn = document.getElementById('btn-submit');
-      btn.innerText = "Menyimpan ke Database...";
+      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> MENYIMPAN DATA...";
       btn.disabled = true;
 
       const dataSiswa = {
-        mode: modeAplikasi,
+        action: 'simpan',
         nama: document.getElementById('in_nama').value,
         nis: document.getElementById('in_nis').value,
         nisn: document.getElementById('in_nisn').value,
         kelas: document.getElementById('in_kelas').value,
-        fotoBase64: document.getElementById('foto_base64').value
+        fotoBase64: document.getElementById('foto_base64').value // Mengirim foto ke server
       };
 
-      // Memanggil fungsi simpan di GAS
-      google.script.run.withSuccessHandler(function(response) {
-        alert(response.pesan); // Menampilkan pesan sukses atau ditolak (karena ganda)
-        if (response.status === "sukses") {
-          document.getElementById('formBukuInduk').reset();
-          document.getElementById('foto-preview-box').innerHTML = "Belum ada foto";
-          document.getElementById('foto_base64').value = "";
-        }
-        btn.innerHTML = modeAplikasi === 'input' ? "<i class='fas fa-save'></i> SIMPAN DATA BARU" : "<i class='fas fa-save'></i> UPDATE DATA SISWA";
-        btn.disabled = false;
-      }).prosesDataSiswa(dataSiswa);
+      try {
+        await fetch(GAS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataSiswa)
+        });
+        alert("BERHASIL! Data Buku Induk (termasuk foto jika ada) dikirim.");
+        document.getElementById('formBukuInduk').reset();
+        document.getElementById('foto-preview-box').innerHTML = "Belum ada foto";
+      } catch (error) {
+        alert("Gagal. Cek koneksi internet Anda.");
+      }
+      
+      btn.innerHTML = "<i class='fas fa-save'></i> SIMPAN BUKU INDUK";
+      btn.disabled = false;
     }
   </script>
 </body>
