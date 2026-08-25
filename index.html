@@ -1,273 +1,167 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Buku Induk SANG21</title>
+  <base target="_top">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* DESAIN DASAR */
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #e2e8f0; }
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; }
     .hidden { display: none !important; }
-    
-    /* LOGIN */
-    .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .login-container { background-color: #1e293b; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid #334155; }
-    .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
-    .btn-login { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .error-msg { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
-
-    /* LAYOUT DASHBOARD */
-    .app-container { display: flex; min-height: 100vh; }
-    
-    /* SIDEBAR (FITUR APLIKASI) */
-    .sidebar { width: 250px; background-color: #1e293b; padding: 20px 0; border-right: 1px solid #334155; }
-    .sidebar-header { padding: 0 20px 20px 20px; border-bottom: 1px solid #334155; margin-bottom: 20px; text-align: center; }
-    .menu-item { padding: 12px 20px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-    .menu-item:hover, .menu-item.active { background-color: #3b82f6; color: white; border-left: 4px solid white; }
-
-    /* KONTEN UTAMA */
-    .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; box-sizing: border-box; }
-    .header-bar { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: center; }
-    
-    /* FORM BUKU INDUK (7 BAGIAN) */
-    .form-section { background-color: #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #334155; }
-    .form-section h3 { margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; color: #3b82f6; }
-    
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #cbd5e1; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; background-color: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
-    
-    .btn-submit { background-color: #10b981; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    .main-content { padding: 30px; max-width: 800px; margin: auto; }
+    .form-section { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;}
+    input, select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box;}
+    button { background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;}
+    .btn-edit-mode { background: #f59e0b; margin-bottom: 20px; }
+    .btn-submit { background: #10b981; font-size: 16px;}
+    .photo-preview { width: 120px; height: 160px; border: 2px dashed #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0f172a; margin-top: 10px; }
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
 
-  <!-- ================= VIEW LOGIN ================= -->
-  <div id="login-view" class="login-wrapper">
-    <div class="login-container">
-      <h2 style="margin-top:0;"><i class="fas fa-book" style="color:#3b82f6;"></i> BUKU INDUK</h2>
-      <p style="color:#94a3b8; font-size:14px;">SDN 21 Sanggalea</p>
-      <form onsubmit="masukAplikasi(event)">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit" id="btn-login" class="btn-login">Masuk Aplikasi</button>
-        <div id="error-msg" class="error-msg">Akses Ditolak!</div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================= VIEW DASHBOARD (FULL APP) ================= -->
-  <div id="app-layout" class="app-container hidden">
+  <div class="main-content">
+    <h2 id="judul-form">Input Data Baru</h2>
     
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h3 style="margin:0; color:#3b82f6;">SANG21</h3>
-        <span id="user-role" style="font-size: 12px; color:#10b981;"></span>
-      </div>
-      <!-- List Fitur -->
-      <div class="menu-item active"><i class="fas fa-user-plus"></i> Tambah Siswa</div>
-      <div class="menu-item"><i class="fas fa-users"></i> Daftar Siswa</div>
-      <div class="menu-item"><i class="fas fa-search"></i> Pencarian</div>
-      <div class="menu-item"><i class="fas fa-print"></i> Cetak Buku Induk</div>
-      <div class="menu-item"><i class="fas fa-file-export"></i> Export Data</div>
-      <div class="menu-item"><i class="fas fa-cogs"></i> Pengaturan</div>
-      <div class="menu-item" style="color:#ef4444;" onclick="keluarAplikasi()"><i class="fas fa-power-off"></i> Keluar</div>
+    <!-- TOMBOL GANTI MODE -->
+    <button class="btn-edit-mode" onclick="toggleEditMode()" id="btn-toggle-mode">
+      <i class="fas fa-search"></i> Ganti ke Mode Edit Data
+    </button>
+
+    <!-- KOTAK PENCARIAN (HANYA MUNCUL SAAT EDIT) -->
+    <div id="box-pencarian" class="form-section hidden">
+      <h3>Cari Data Siswa</h3>
+      <label>Masukkan NIS Siswa yang ingin diedit:</label>
+      <input type="number" id="search_nis" placeholder="Ketik NIS...">
+      <button onclick="cariSiswa()" id="btn-cari"><i class="fas fa-search"></i> Cari Data</button>
     </div>
 
-    <!-- KONTEN -->
-    <div class="main-content">
-      <div class="header-bar">
-        <h2>Input Buku Induk Siswa</h2>
-      </div>
-
-      <form id="formBukuInduk" onsubmit="kirimData(event)">
+    <!-- FORM UTAMA -->
+    <form id="formBukuInduk" onsubmit="kirimData(event)">
+      <div class="form-section">
+        <label>Pas Foto Siswa (Maks 5MB)</label>
+        <input type="file" id="in_foto" accept="image/png, image/jpeg" onchange="previewFoto(event)">
+        <div id="foto-preview-box" class="photo-preview">Belum ada foto</div>
+        <input type="hidden" id="foto_base64">
         
-        <!-- BAGIAN 1: DATA KELAS -->
-        <div class="form-section">
-          <h3>1. Data Kelas & Penerimaan</h3>
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Pilih Kelas (17 Rombel)</label>
-              <select id="in_kelas" required>
-                <option value="">-- Pilih Kelas --</option>
-                <option value="1A">Kelas 1A</option><option value="1B">Kelas 1B</option><option value="1C">Kelas 1C</option>
-                <option value="2A">Kelas 2A</option><option value="2B">Kelas 2B</option><option value="2C">Kelas 2C</option>
-                <option value="3A">Kelas 3A</option><option value="3B">Kelas 3B</option><option value="3C">Kelas 3C</option>
-                <option value="4A">Kelas 4A</option><option value="4B">Kelas 4B</option><option value="4C">Kelas 4C</option>
-                <option value="5A">Kelas 5A</option><option value="5B">Kelas 5B</option><option value="5C">Kelas 5C</option>
-                <option value="6A">Kelas 6A</option><option value="6B">Kelas 6B</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Tanggal Diterima</label>
-              <input type="date" id="in_tglDiterima">
-            </div>
-          </div>
-        </div>
-
-        <!-- BAGIAN 2: DATA SISWA -->
-        <div class="form-section">
-          <h3>2. Data Utama Siswa</h3>
-          <div class="form-group">
-            <label>Nama Lengkap Siswa</label>
-            <input type="text" id="in_nama" required>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label>NISN</label>
-              <input type="number" id="in_nisn" required>
-            </div>
-            <div class="form-group">
-              <label>NIK (Nomor Induk Kependudukan)</label>
-              <input type="number" id="in_nik">
-            </div>
-            <div class="form-group">
-              <label>Tempat Lahir</label>
-              <input type="text" id="in_tempatLahir">
-            </div>
-            <div class="form-group">
-              <label>Tanggal Lahir</label>
-              <input type="date" id="in_tglLahir">
-            </div>
-          </div>
-        </div>
-
-        <!-- BAGIAN 3: DATA ORTU -->
-        <div class="form-section">
-          <h3>3. Data Orang Tua / Wali</h3>
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Nama Ayah</label>
-              <input type="text" id="in_ayah">
-            </div>
-            <div class="form-group">
-              <label>Pekerjaan Ayah</label>
-              <input type="text" id="in_kerjaAyah">
-            </div>
-            <div class="form-group">
-              <label>Nama Ibu</label>
-              <input type="text" id="in_ibu">
-            </div>
-            <div class="form-group">
-              <label>No HP / WA Aktif</label>
-              <input type="number" id="in_nohp">
-            </div>
-          </div>
-        </div>
-
-        <!-- Bagian 4-7 digabung agar tidak terlalu kepanjangan di HTML ini, tapi field esensialnya ada -->
-        <div class="form-section">
-          <h3>4-7. Pendidikan, Kesehatan, Prestasi & Mutasi</h3>
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Asal TK / Sekolah Sebelumnya</label>
-              <input type="text" id="in_asaltk">
-            </div>
-            <div class="form-group">
-              <label>Golongan Darah</label>
-              <select id="in_goldar">
-                <option value="-">-- Pilih --</option>
-                <option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Prestasi Menonjol</label>
-              <input type="text" id="in_prestasi" placeholder="Misal: Juara 1 Lomba Puisi">
-            </div>
-            <div class="form-group">
-              <label>Status Siswa</label>
-              <select id="in_status">
-                <option value="Aktif">Aktif</option>
-                <option value="Pindah/Mutasi">Pindah / Mutasi</option>
-                <option value="Lulus">Lulus</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <button type="submit" id="btn-submit" class="btn-submit">
-          <i class="fas fa-save"></i> SIMPAN BUKU INDUK
-        </button>
-
-      </form>
-    </div>
+        <label>Nama Lengkap</label>
+        <input type="text" id="in_nama" required>
+        
+        <label>NIS</label>
+        <input type="number" id="in_nis" required>
+        
+        <label>NISN</label>
+        <input type="number" id="in_nisn" required>
+        
+        <label>Kelas</label>
+        <select id="in_kelas" required>
+          <option value="">-- Pilih --</option>
+          <option value="1A">1A</option><option value="2A">2A</option>
+        </select>
+      </div>
+      
+      <button type="submit" id="btn-submit" class="btn-submit">
+        <i class="fas fa-save"></i> SIMPAN DATA BARU
+      </button>
+    </form>
   </div>
 
   <script>
-    // URL Web App GAS Anda (Pastikan update jika deploy versi baru)
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwoMJzIIjcLTaVtX-Eslnf3__HKp2IbXSqjiiqlhm89lGsLb55PbE0_odCMRcigBSOo/exec";
+    var modeAplikasi = 'input'; // Default adalah input baru
 
-    function masukAplikasi(event) {
-      event.preventDefault();
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
-      const err = document.getElementById('error-msg');
-      
-      if (u === "admin" && p === "admin123") {
-        document.getElementById('login-view').classList.add('hidden');
-        document.getElementById('app-layout').classList.remove('hidden');
-        document.getElementById('user-role').innerText = "Akses: Administrator / Guru";
-      } 
-      // Nah, ini dia baris yang hilang kemarin bro!
-      else if (u === "ortu" && p === "ortu123") {
-        document.getElementById('login-view').classList.add('hidden');
-        document.getElementById('app-layout').classList.remove('hidden');
-        document.getElementById('user-role').innerText = "Akses: Orang Tua / Wali";
-      } 
-      else {
-        err.style.display = 'block';
+    // FUNGSI GANTI MODE (INPUT / EDIT)
+    function toggleEditMode() {
+      const boxCari = document.getElementById('box-pencarian');
+      const btnToggle = document.getElementById('btn-toggle-mode');
+      const judul = document.getElementById('judul-form');
+      const btnSubmit = document.getElementById('btn-submit');
+      const inputNis = document.getElementById('in_nis');
+
+      if (modeAplikasi === 'input') {
+        modeAplikasi = 'edit';
+        boxCari.classList.remove('hidden');
+        btnToggle.innerHTML = "<i class='fas fa-plus'></i> Kembali ke Mode Input Baru";
+        btnToggle.style.background = "#3b82f6";
+        judul.innerText = "Edit Data Siswa";
+        btnSubmit.innerHTML = "<i class='fas fa-save'></i> UPDATE DATA SISWA";
+        btnSubmit.style.background = "#f59e0b";
+        inputNis.readOnly = true; // NIS tidak boleh diubah saat edit
+      } else {
+        modeAplikasi = 'input';
+        boxCari.classList.add('hidden');
+        btnToggle.innerHTML = "<i class='fas fa-search'></i> Ganti ke Mode Edit Data";
+        btnToggle.style.background = "#f59e0b";
+        judul.innerText = "Input Data Baru";
+        btnSubmit.innerHTML = "<i class='fas fa-save'></i> SIMPAN DATA BARU";
+        btnSubmit.style.background = "#10b981";
+        inputNis.readOnly = false;
+        document.getElementById('formBukuInduk').reset();
+        document.getElementById('foto-preview-box').innerHTML = "Belum ada foto";
       }
     }
 
-    function keluarAplikasi() {
-      document.getElementById('app-layout').classList.add('hidden');
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
+    // FUNGSI CARI DATA (UNTUK EDIT)
+    function cariSiswa() {
+      const nisDicari = document.getElementById('search_nis').value;
+      if(!nisDicari) return alert("Masukkan NIS dulu!");
+      
+      const btnCari = document.getElementById('btn-cari');
+      btnCari.innerText = "Mencari...";
+      
+      // Memanggil fungsi cari di GAS (tanpa CORS!)
+      google.script.run.withSuccessHandler(function(hasil) {
+        btnCari.innerHTML = "<i class='fas fa-search'></i> Cari Data";
+        if (hasil.ketemu) {
+          document.getElementById('in_nama').value = hasil.nama;
+          document.getElementById('in_nis').value = hasil.nis;
+          document.getElementById('in_nisn').value = hasil.nisn;
+          document.getElementById('in_kelas').value = hasil.kelas;
+          alert("Data ditemukan! Silakan edit di bawah.");
+        } else {
+          alert("Data dengan NIS " + nisDicari + " tidak ditemukan!");
+        }
+      }).cariDataSiswa(nisDicari);
     }
 
-    async function kirimData(event) {
+    // FUNGSI PREVIEW FOTO
+    function previewFoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 5242880) return alert("Maksimal 5MB!");
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('foto-preview-box').innerHTML = `<img src="${e.target.result}">`;
+          document.getElementById('foto_base64').value = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // FUNGSI KIRIM DATA (INPUT / UPDATE)
+    function kirimData(event) {
       event.preventDefault();
       const btn = document.getElementById('btn-submit');
-      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> MENYIMPAN DATA...";
+      btn.innerText = "Menyimpan ke Database...";
       btn.disabled = true;
 
       const dataSiswa = {
-        action: 'simpan',
-        kelas: document.getElementById('in_kelas').value,
+        mode: modeAplikasi,
         nama: document.getElementById('in_nama').value,
+        nis: document.getElementById('in_nis').value,
         nisn: document.getElementById('in_nisn').value,
-        nik: document.getElementById('in_nik').value,
-        tempatLahir: document.getElementById('in_tempatLahir').value,
-        tglLahir: document.getElementById('in_tglLahir').value,
-        ayah: document.getElementById('in_ayah').value,
-        kerjaAyah: document.getElementById('in_kerjaAyah').value,
-        ibu: document.getElementById('in_ibu').value,
-        nohp: document.getElementById('in_nohp').value,
-        asaltk: document.getElementById('in_asaltk').value,
-        goldar: document.getElementById('in_goldar').value,
-        prestasi: document.getElementById('in_prestasi').value,
-        status: document.getElementById('in_status').value
+        kelas: document.getElementById('in_kelas').value,
+        fotoBase64: document.getElementById('foto_base64').value
       };
 
-      try {
-        await fetch(GAS_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataSiswa)
-        });
-        alert("BERHASIL! Data Buku Induk tersimpan.");
-        document.getElementById('formBukuInduk').reset();
-      } catch (error) {
-        alert("Gagal. Cek koneksi internet Anda.");
-      }
-      
-      btn.innerHTML = "<i class='fas fa-save'></i> SIMPAN BUKU INDUK";
-      btn.disabled = false;
+      // Memanggil fungsi simpan di GAS
+      google.script.run.withSuccessHandler(function(response) {
+        alert(response.pesan); // Menampilkan pesan sukses atau ditolak (karena ganda)
+        if (response.status === "sukses") {
+          document.getElementById('formBukuInduk').reset();
+          document.getElementById('foto-preview-box').innerHTML = "Belum ada foto";
+          document.getElementById('foto_base64').value = "";
+        }
+        btn.innerHTML = modeAplikasi === 'input' ? "<i class='fas fa-save'></i> SIMPAN DATA BARU" : "<i class='fas fa-save'></i> UPDATE DATA SISWA";
+        btn.disabled = false;
+      }).prosesDataSiswa(dataSiswa);
     }
   </script>
 </body>
