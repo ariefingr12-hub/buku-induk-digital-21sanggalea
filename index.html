@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>SANG21 - Portal Pendataan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* CSS TEMA TETAP SAMA SEPERTI SEBELUMNYA */
+    :root { --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.5); --text-main: #f8fafc; --text-muted: #94a3b8; --glass-bg: rgba(15, 23, 42, 0.6); --glass-border: rgba(255, 255, 255, 0.1); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: radial-gradient(circle at 10% 20%, #0f172a 0%, #020617 100%); color: var(--text-main); min-height: 100vh; overflow: hidden; }
+    body::before { content: ""; position: absolute; top: -20%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); z-index: -1; filter: blur(40px); }
+    .hidden { display: none !important; }
+    
+    #login-view { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10; position: relative; }
+    .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 420px; text-align: center; }
+    .glass-input { width: 100%; padding: 15px; margin-bottom: 20px; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--glass-border); border-radius: 12px; color: white; font-size: 14px; transition: all 0.3s ease; outline: none; }
+    .glass-input:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+    .btn-cinematic { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; transition: all 0.3s; box-shadow: 0 4px 15px var(--primary-glow); }
+    .btn-cinematic:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
+    .btn-cinematic:disabled { opacity: 0.7; cursor: not-allowed; }
+    
+    #app-layout { display: flex; height: 100vh; }
+    .sidebar { width: 280px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 5; }
+    .sidebar-header { padding: 30px 20px; border-bottom: 1px solid var(--glass-border); text-align: center; }
+    .nav-links { list-style: none; padding: 20px 15px; overflow-y: auto; flex: 1; }
+    .nav-links::-webkit-scrollbar { width: 5px; }
+    .nav-links::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    .nav-links li { padding: 12px 15px; margin-bottom: 6px; border-radius: 10px; cursor: pointer; font-size: 14px; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
+    .nav-links li:hover, .nav-links li.active { background: rgba(59, 130, 246, 0.15); color: white; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .menu-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin: 20px 0 10px 10px; letter-spacing: 2px; }
+    
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .top-header { padding: 20px 40px; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
+    .view-section { padding: 40px; overflow-y: auto; flex: 1; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .form-group { display: flex; flex-direction: column; text-align: left; }
+    .form-group label { font-size: 13px; font-weight: 500; margin-bottom: 8px; color: var(--text-muted); }
+    
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .sidebar { width: 240px; position: absolute; height: 100%; transform: translateX(-100%); transition: 0.3s; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. HALAMAN LOGIN -->
+  <div id="login-view">
+    <div class="glass-card">
+      <div style="font-size: 40px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-fingerprint"></i></div>
+      <h1 style="margin-bottom: 5px; font-weight: 700;">PORTAL SANG21</h1>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 35px;">Sistem Pendataan SDN 21 Sanggalea</p>
+      
+      <input type="text" id="username" class="glass-input" placeholder="Masukkan Username">
+      <input type="password" id="password" class="glass-input" placeholder="Masukkan Password">
+      <p id="error-msg" style="color: #f87171; font-size: 13px; display: none; margin-bottom: 15px; font-weight: 500;"></p>
+      
+      <button class="btn-cinematic" onclick="masukAplikasi()">
+        <i class="fas fa-sign-in-alt"></i> Masuk Sistem
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD UTAMA -->
+  <div id="app-layout" class="hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2 style="font-size: 22px; font-weight: 700; background: -webkit-linear-gradient(#fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SANG21</h2>
+        <p id="user-role" style="font-size: 12px; color: var(--primary); margin-top: 5px; font-weight: 600;"></p>
+      </div>
+      
+      <ul class="nav-links" id="sidebar-menu">
+        <li class="active" onclick="bukaView('dashboard')"><i class="fas fa-layer-group" style="width:20px;"></i> Dashboard Utama</li>
+        <div class="menu-title">MANAJEMEN KELAS</div>
+        <!-- Generator Kelas Otomatis -->
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-header">
+        <div>
+          <span style="font-weight: 600; font-size: 18px;"><i class="fas fa-users" style="color: var(--primary); margin-right:10px;"></i>Data Peserta Didik</span>
+        </div>
+        <button onclick="logout()" style="border:none; background:rgba(239, 68, 68, 0.1); color:#f87171; padding: 8px 15px; border-radius: 8px; cursor:pointer; font-weight:600; transition:0.3s; border:1px solid rgba(239, 68, 68, 0.2);">
+          <i class="fas fa-power-off"></i> Logout
+        </button>
+      </header>
+
+      <!-- Dashboard Awal -->
+      <section id="view-dashboard" class="view-section">
+        <h2 style="font-size: 28px; margin-bottom: 10px;">Selamat Datang di Sistem!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Pilih kelas di panel sebelah kiri untuk memulai penginputan data peserta didik.</p>
+        
+        <div class="glass-card" style="max-width: 100%; text-align: left; padding: 30px;">
+          <h3 style="margin-bottom: 15px; color: var(--primary);"><i class="fas fa-info-circle"></i> Panduan Penggunaan</h3>
+          <ul style="color: var(--text-muted); font-size: 14px; margin-left: 20px; line-height: 1.8;">
+            <li>Pastikan data yang diinput sesuai dengan Akta Kelahiran dan Kartu Keluarga (KK).</li>
+            <li>Data yang Anda kirim akan otomatis terekap di dalam Spreadsheet.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Form Input Data -->
+      <section id="view-form" class="view-section hidden">
+        <h2 id="judul-form-kelas" style="font-size: 24px; margin-bottom: 25px; border-left: 4px solid var(--primary); padding-left: 15px;">Input Data - Kelas</h2>
+        
+        <div class="glass-card" style="max-width: 800px; text-align: left; padding: 35px;">
+          <!-- PENTING: onSubmit sekarang memanggil fungsi kirimData(event) -->
+          <form id="formSiswa" onsubmit="kirimData(event)">
+            
+            <h4 style="color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">A. Data Pribadi Siswa</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nama Lengkap (Sesuai Akta) *</label>
+                <input type="text" id="in_nama" class="glass-input" required placeholder="Contoh: Budi Santoso">
+              </div>
+              <div class="form-group">
+                <label>NISN</label>
+                <input type="number" id="in_nisn" class="glass-input" placeholder="Masukkan 10 digit NISN">
+              </div>
+              <div class="form-group">
+                <label>Tempat Lahir *</label>
+                <input type="text" id="in_tempatLahir" class="glass-input" required placeholder="Kota kelahiran">
+              </div>
+              <div class="form-group">
+                <label>Tanggal Lahir *</label>
+                <input type="date" id="in_tglLahir" class="glass-input" required>
+              </div>
+              <div class="form-group">
+                <label>Jenis Kelamin *</label>
+                <select id="in_jk" class="glass-input" required style="background-color: #0f172a;">
+                  <option value="">-- Pilih Jenis Kelamin --</option>
+                  <option value="L">Laki-Laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Agama *</label>
+                <select id="in_agama" class="glass-input" required style="background-color: #0f172a;">
+                  <option value="">-- Pilih Agama --</option>
+                  <option value="Islam">Islam</option>
+                  <option value="Kristen">Kristen</option>
+                  <option value="Katolik">Katolik</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Buddha">Buddha</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+              <label>Alamat Lengkap (Jalan, RT/RW, Dusun) *</label>
+              <textarea id="in_alamat" class="glass-input" rows="3" required placeholder="Tuliskan alamat domisili saat ini..."></textarea>
+            </div>
+
+            <h4 style="color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">B. Data Orang Tua / Wali</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Nama Ayah Kandung</label>
+                <input type="text" id="in_namaAyah" class="glass-input" placeholder="Nama Ayah">
+              </div>
+              <div class="form-group">
+                <label>Nama Ibu Kandung *</label>
+                <input type="text" id="in_namaIbu" class="glass-input" required placeholder="Nama Ibu (Wajib)">
+              </div>
+              <div class="form-group">
+                <label>Pekerjaan Orang Tua</label>
+                <input type="text" id="in_pekerjaan" class="glass-input" placeholder="Contoh: Wiraswasta / PNS">
+              </div>
+              <div class="form-group">
+                <label>No. HP / WhatsApp Aktif *</label>
+                <input type="number" id="in_noHp" class="glass-input" required placeholder="08xxxxxxxxxx">
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+              <button type="submit" id="btn-submit" class="btn-cinematic" style="width: auto; padding: 15px 40px;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> Simpan Data Siswa
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+   // MASUKKAN URL WEB APP GAS ANDA DI SINI
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxBfXjeWQMJ2IvKWIO9DXxJY43YRR0DGxzosMN5UONJnFCzDD9dKXsmqEyoK_S1mLPh/exec";
+
+    const daftarKelas = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C', '4A', '4B', '4C', '5A', '5B', '5C', '6A', '6B'];
+    let kelasAktif = "";
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuContainer = document.getElementById('sidebar-menu');
+      daftarKelas.forEach(kelas => {
+        const li = document.createElement('li');
+        li.innerHTML = `<i class="fas fa-user-graduate" style="width:20px;"></i> Kelas ${kelas}`;
+        li.onclick = () => bukaFormKelas(kelas, li);
+        menuContainer.appendChild(li);
+      });
+    });
+
+    // --- FUNGSI LOGIN (VERSI FETCH API UNTUK VERCEL) ---
+    async function masukAplikasi() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Authenticating...";
+
+      try {
+        // Tembak data ke URL Google Script
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'login',
+            username: user,
+            password: pass
+          })
+        });
+
+        const res = await response.json(); // Terima jawaban dari GAS
+        btn.innerHTML = originalText;
+
+        if (res.success) {
+          document.getElementById('login-view').style.opacity = '0';
+          setTimeout(() => {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-layout').classList.remove('hidden');
+            document.getElementById('user-role').innerHTML = `<i class="fas fa-user-check"></i> Akses: ${res.nama}`;
+          }, 400); 
+        } else {
+          const err = document.getElementById('error-msg');
+          err.innerText = res.message;
+          err.style.display = 'block';
+        }
+      } catch (error) {
+        btn.innerHTML = originalText;
+        const err = document.getElementById('error-msg');
+        err.innerText = "Gagal terhubung ke server database.";
+        err.style.display = 'block';
+      }
+    }
+
+    // --- FUNGSI KIRIM DATA (VERSI FETCH API UNTUK VERCEL) ---
+    async function kirimData(e) {
+      e.preventDefault(); 
+      
+      const btn = document.getElementById('btn-submit');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Menyimpan...";
+      btn.disabled = true; 
+
+      const dataSiswa = {
+        kelas: kelasAktif, 
+        nama: document.getElementById('in_nama').value,
+        nisn: document.getElementById('in_nisn').value,
+        tempatLahir: document.getElementById('in_tempatLahir').value,
+        tglLahir: document.getElementById('in_tglLahir').value,
+        jk: document.getElementById('in_jk').value,
+        agama: document.getElementById('in_agama').value,
+        alamat: document.getElementById('in_alamat').value,
+        namaAyah: document.getElementById('in_namaAyah').value,
+        namaIbu: document.getElementById('in_namaIbu').value,
+        pekerjaan: document.getElementById('in_pekerjaan').value,
+        noHp: document.getElementById('in_noHp').value
+      };
+
+      try {
+        // Tembak data form ke GAS
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'simpan',
+            payload: dataSiswa
+          })
+        });
+
+        const res = await response.json();
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        if (res.success) {
+          alert('Berhasil: ' + res.message);
+          document.getElementById('formSiswa').reset(); 
+        } else {
+          alert('Gagal: ' + res.message);
+        }
+      } catch (error) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert('Gagal terhubung ke server database.');
+      }
+    }
+
+    // Fungsi buka view dan logout tetap sama seperti sebelumnya
+    function logout() {
+      document.getElementById('app-layout').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('login-view').style.opacity = '1';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('error-msg').style.display = 'none';
+      bukaView('dashboard'); 
+    }
+
+    function bukaView(id) {
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-form').classList.add('hidden');
+      document.getElementById('view-' + id).classList.remove('hidden');
+      document.querySelectorAll('#sidebar-menu li').forEach(el => el.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+
+    function bukaFormKelas(kelas, elemenList) {
+      kelasAktif = kelas; 
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-form').classList.remove('hidden');
+      document.getElementById('judul-form-kelas').innerHTML = `Input Data Siswa - <span style="color:var(--primary);">Kelas ${kelas}</span>`;
+      document.querySelectorAll('#sidebar-menu li').forEach(el => el.classList.remove('active'));
+      if(elemenList) elemenList.classList.add('active');
+      document.getElementById('formSiswa').reset(); 
+    }
